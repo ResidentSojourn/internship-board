@@ -1,0 +1,12 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+:root {
+    --background: #607381;
+    
+    --deep-background: #2C404F;
+    --deep-border: #21303b;
+
+    --primary-text: #e6e3e3;
+    --secondary-text: #cccccc;
+}
