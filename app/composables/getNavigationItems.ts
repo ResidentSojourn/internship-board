@@ -49,5 +49,5 @@ export function getNavigationItems() {
         return itemList
     })
 
-    return { items, isSuperAdmin }
+    return { items }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-	const { items, isSuperAdmin } = getNavigationItems()
+	const { items } = getNavigationItems()
+	const { isSuperAdmin } = authorization()
 </script>
 
 <template>
@@ -25,7 +26,9 @@
 			</UHeader>
 
 			<!-- Remainder of page (app/pages/index.vue) -->
-			<NuxtPage />
+			<div class="p-8">
+				<NuxtPage />
+			</div>
 		</div>
 	</UApp>
 </template>

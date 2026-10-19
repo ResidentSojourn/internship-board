@@ -3,10 +3,17 @@
 
 :root {
     --background: #607381;
-    
+    --primary-text: #e6e3e3;
+
     --deep-background: #2C404F;
     --deep-border: #21303b;
 
-    --primary-text: #e6e3e3;
+    --secondary-background: #3e5769;
+    --secondary-border: #21303b;
     --secondary-text: #cccccc;
+}
+
+.gap {
+    display: inline-block;
+    min-width: 4ch;
 }
