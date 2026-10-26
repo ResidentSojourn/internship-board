@@ -202,6 +202,18 @@ export function getAllInternships() {
     return { internships }
 }
 
+export function getInternship(id : number) {
+    const { internships } = getAllInternships()
+    
+    return internships.find(i => i.id === id) ?? null
+}
+
+export function getTagCategory(id : number) {
+    const { tagCategories } = getTagCategories()
+
+    return tagCategories.find(tc => tc.id === id) ?? null
+}
+
 export function getTagCategories() {
     const tagCategories : TagCategory[] = [
         {
@@ -258,6 +270,28 @@ export function getTags(category : TagCategory) {
             categoryId: 2
         })
     }
+
+    return { tags }
+}
+
+export function getInternshipTags(id : number) {
+    const tags : Tag[] = []
+
+    tags.push({
+        id: 0,
+        text: "CS",
+        categoryId: 0
+    })
+    tags.push({
+        id: 1,
+        text: "MA",
+        categoryId: 0
+    })
+    tags.push({
+        id: 4,
+        text: "Odd",
+        categoryId: 2
+    })
 
     return { tags }
 }

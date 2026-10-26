@@ -2,9 +2,10 @@
 
 <script setup lang="ts">
 	const { internships } = getInternships()
-	const { tagCategories } = getTagCategories()
 
 	const categoriesTags = new Map<number, Tag[]>()
+	
+	const { tagCategories } = getTagCategories()
 	
 	const tagButtons = reactive<Record<number, boolean>>(
 		Object.fromEntries(tagCategories.map(id => [id, false]))
@@ -25,9 +26,11 @@
 				<li v-for="internship in internships" :key="internship.id">
 					<div class="bg-[var(--secondary-background)]
 							rounded-lg ring-2 ring-[var(--secondary-border)] p-4">
-						<h3 class="text-[color:var(--primary-text)]">
-							{{ internship.title }}
-						</h3>
+						<NuxtLink :to="`/internships/${internship.id}`">
+							<h3 class="text-[color:var(--primary-text)]">
+								{{ internship.title }}
+							</h3>
+						</NuxtLink>
 
 						<span class="gap"></span>
 
@@ -60,4 +63,3 @@
 		</div>
 	</div>
 </template>
-
