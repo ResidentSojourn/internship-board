@@ -1,92 +1,120 @@
 <script setup lang="ts">
-    // Grab internship ID from the URL
-	const route = useRoute()
-	const internshipId = computed(() => {
-        const raw = route.params.id
-        
-        if (!raw)
-            return -1
+type InternshipDetails = {
+	InternshipID: number
+	EmployerID: number
+	FacultyID: number
+	Title: string
+	Description: string | null
+	PostDate: string | null
+	ExpDate: string | null
+	Link: string | null
+	EmployerName: string | null
+	EmployerCompany: string | null
+	EmployerContact: string | null
+	FacultyEmail: string | null
+}
 
-            // Get first index in string if its an array, else just raw
-            const str = Array.isArray(raw) ? raw[0] : raw
+type InternshipTag = {
+	TagID: number
+	TagTitle: string
+	CategoryID: number
+	Category: string | null
+}
 
-            return Number(str)
-    })
+type InternshipResponse = {
+	internship: InternshipDetails
+	tags: InternshipTag[]
+}
 
-    // Query database.vue for internship
-    const result = getInternship(internshipId.value)
+const route = useRoute()
+const internshipId = computed(() => {
+	const param = route.params.id
+	return Array.isArray(param) ? param[0] ?? '' : param ?? ''
+})
 
-    if (!result) {
-        throw createError({ statusCode: 404, statusMessage: 'Post not found' })
-    }
+const { data, pending, error } = await useFetch<InternshipResponse>(
+	() => `/api/internships/${encodeURIComponent(internshipId.value)}`,
+)
 
-    const internship : Internship = result
+function formatDate(value: string | null) {
+	return value ? value.split(' ')[0] : 'Not specified'
+}
 
-    // Pull out categories for tags
-    const tagCategories : TagCategory[] = []
-    const categoriesTags = new Map<number, Tag[]>()
-
-    const { tags } = getInternshipTags(internship.id)
-
-    tags.forEach((tag, index) => {
-        const tagCatResult = getTagCategory(tag.categoryId)
-
-        if (tagCatResult) {
-            const tagCat = tagCatResult
-
-            // Add tag category
-            if (!tagCategories.find(tc => tc.id === tagCat.id)) {
-                tagCategories.push(tagCat)
-            }
-
-            // Fill in tags for category
-            if (!categoriesTags.has(tagCat.id)) {
-                categoriesTags.set(tagCat.id, [])
-            }
-
-            categoriesTags.get(tagCat.id)?.push(tag)
-        }
-    })
+function isHttpLink(value: string | null): value is string {
+	return value !== null && /^https?:\/\//i.test(value)
+}
 </script>
 
 <template>
-    <div class="grid grid-cols-3 min-h-[calc(100vh-4rem)] gap-3">
-		<!-- Internships details view -->
+	<div class="grid grid-cols-3 min-h-[calc(100vh-4rem)] gap-3">
 		<div class="col-span-2">
-			<div class="bg-[var(--secondary-background)]
-                    rounded-lg ring-2 ring-[var(--secondary-border)] p-4">
-						<h1 class="text-[color:var(--primary-text)]">
-                            {{ internship.title }}
-                        </h1>
+			<p v-if="pending" class="text-[color:var(--secondary-text)]">Loading internship...</p>
+			<p v-else-if="error" class="text-[color:var(--secondary-text)]">
+				{{ error.statusCode === 404 ? 'Internship not found.' : 'Could not load this internship. Please try again later.' }}
+			</p>
+			<article
+				v-else-if="data"
+				class="bg-[var(--secondary-background)] rounded-lg ring-2 ring-[var(--secondary-border)] p-4"
+			>
+				<h1 class="text-xl font-bold text-[color:var(--primary-text)]">
+					{{ data.internship.Title }}
+				</h1>
 
-						<span class="gap"></span>
+				<p class="mt-1 text-[color:var(--secondary-text)]">
+					{{ data.internship.EmployerName }}
+					<span v-if="data.internship.EmployerCompany"> · {{ data.internship.EmployerCompany }}</span>
+				</p>
 
-						<div class="text-[color:var(--secondary-text)]">
-							{{ internship.description }}
-						</div>
+				<p class="mt-4 whitespace-pre-line text-[color:var(--secondary-text)]">
+					{{ data.internship.Description || 'No description provided.' }}
+				</p>
+
+				<dl class="mt-4 space-y-2 text-sm text-[color:var(--secondary-text)]">
+					<div>
+						<dt class="inline font-bold">Posted: </dt>
+						<dd class="inline">{{ formatDate(data.internship.PostDate) }}</dd>
 					</div>
-					<span class="gap"></span>
+					<div>
+						<dt class="inline font-bold">Expires: </dt>
+						<dd class="inline">{{ formatDate(data.internship.ExpDate) }}</dd>
+					</div>
+					<div v-if="data.internship.EmployerContact">
+						<dt class="inline font-bold">Employer contact: </dt>
+						<dd class="inline">{{ data.internship.EmployerContact }}</dd>
+					</div>
+					<div v-if="data.internship.FacultyEmail">
+						<dt class="inline font-bold">Faculty contact: </dt>
+						<dd class="inline">{{ data.internship.FacultyEmail }}</dd>
+					</div>
+					<div v-if="isHttpLink(data.internship.Link)">
+						<dt class="inline font-bold">More information: </dt>
+						<dd class="inline">
+							<a
+								:href="data.internship.Link"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-[color:var(--primary-text)] underline"
+							>
+								Open internship link
+							</a>
+						</dd>
+					</div>
+				</dl>
+			</article>
 		</div>
 
-		<!-- Tags view -->
-		<div class="col-span-1 bg-[var(--secondary-background)]
-				rounded-lg ring-2 ring-[var(--secondary-border)]
-				p-4 text-[color:var(--secondary-text)]">
-			<ul>
-				<li v-for="tagCat in tagCategories" :key="tagCat.id">
-					{{ tagCat.text }}
-
-					<li v-for="tag in categoriesTags.get(tagCat.id)" :key="tag.id">
-						<span class="gap"></span>
-
-                        <div class="text-[color:var(--primary-text)]">
-                            [ ✓ ] {{ tag.text }}
-                        </div>
-					</li>
-
-					<span class="gap"></span>
+		<aside class="col-span-1 rounded-lg bg-[var(--secondary-background)]
+				ring-2 ring-[var(--secondary-border)] p-4 text-[color:var(--secondary-text)]">
+			<h2 class="font-bold text-[color:var(--primary-text)]">Internship tags</h2>
+			<p v-if="pending" class="mt-2">Loading tags...</p>
+			<p v-else-if="error" class="mt-2">Tags are unavailable.</p>
+			<p v-else-if="data?.tags.length === 0" class="mt-2">No tags assigned.</p>
+			<ul v-else-if="data" class="mt-2 space-y-2">
+				<li v-for="tag in data.tags" :key="tag.TagID">
+					<span class="text-[color:var(--secondary-text)]">{{ tag.Category || 'Other' }}:</span>
+					<span class="ml-1 text-[color:var(--primary-text)]">{{ tag.TagTitle }}</span>
 				</li>
 			</ul>
-		</div>
+		</aside>
 	</div>
 </template>

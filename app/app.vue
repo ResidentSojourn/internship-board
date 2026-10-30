@@ -1,6 +1,7 @@
 <script setup lang="ts">
 	const { items } = getNavigationItems()
 	const { isSuperAdmin } = authorization()
+
 </script>
 
 <template>

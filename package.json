@@ -12,8 +12,12 @@
   "dependencies": {
     "@nuxt/ui": "^4.11.3",
     "nuxt": "^4.5.2",
+    "sqlite3": "^6.0.1",
     "tailwindcss": "^4.3.3",
     "vue": "^3.5.43",
     "vue-router": "^5.3.1"
+  },
+  "allowScripts": {
+    "sqlite3@6.0.1": true
   }
 }
