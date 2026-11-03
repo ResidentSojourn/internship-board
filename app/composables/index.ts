@@ -1,0 +1,75 @@
+import type { Internship, Tag, InternshipTag } from '~/composables/database'
+
+type IndexPageData = {
+    Internships: Internship[]
+    Tags: Tag[]
+    InterTags: InternshipTag[]
+}
+
+export const useIndexPage = () => {
+    const { data, pending, error } = useFetch<IndexPageData>('/api/mainPageData')
+    const tagFilters = reactive<Record<number, boolean>>({})
+
+    const tagCategories = computed(() => {
+        const categories = new Map<number, { id: number, name: string, tags: Tag[] }>()
+
+        for (const tag of data.value?.Tags ?? []) {
+            let category = categories.get(tag.CategoryID)
+            if (!category) {
+                category = {
+                    id: tag.CategoryID,
+                    name: tag.Category ?? 'Other',
+                    tags: [],
+                }
+                categories.set(tag.CategoryID, category)
+            }
+            category.tags.push(tag)
+        }
+
+        return [...categories.values()]
+    })
+
+    const selectedTagIdsByCategory = computed(() => {
+        const selectedByCategory = new Map<number, number[]>()
+
+        for (const tag of data.value?.Tags ?? []) {
+            if (!tagFilters[tag.TagID]) {
+                continue
+            }
+
+            const selectedTagIds = selectedByCategory.get(tag.CategoryID) ?? []
+            selectedTagIds.push(tag.TagID)
+            selectedByCategory.set(tag.CategoryID, selectedTagIds)
+        }
+
+        return [...selectedByCategory.values()]
+    })
+
+    const internships = computed(() => {
+        const now = Date.now()
+
+        return (data.value?.Internships ?? [])
+            .filter(internship => !internship.ExpDate || Date.parse(internship.ExpDate) >= now)
+            .filter(internship =>
+                selectedTagIdsByCategory.value.every(categoryTagIds =>
+                    categoryTagIds.some(tagID =>
+                        data.value?.InterTags.some(tag =>
+                            tag.InternshipID === internship.InternshipID && tag.TagID === tagID,
+                        ),
+                    ),
+                )
+            )
+            .sort((a, b) => Date.parse(b.PostDate ?? '') - Date.parse(a.PostDate ?? ''))
+    })
+
+    return { pending, error, tagFilters, tagCategories, internships }
+}
+
+
+export function formatDate(value: string | null) {
+    return value ? value.split(' ')[0] : 'Not specified'
+}
+
+export function isHttpLink(value: string | null): value is string {
+    return value !== null && /^https?:\/\//i.test(value)
+}

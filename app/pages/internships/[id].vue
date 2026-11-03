@@ -1,48 +1,7 @@
 <script setup lang="ts">
-type InternshipDetails = {
-	InternshipID: number
-	EmployerID: number
-	FacultyID: number
-	Title: string
-	Description: string | null
-	PostDate: string | null
-	ExpDate: string | null
-	Link: string | null
-	EmployerName: string | null
-	EmployerCompany: string | null
-	EmployerContact: string | null
-	FacultyEmail: string | null
-}
-
-type InternshipTag = {
-	TagID: number
-	TagTitle: string
-	CategoryID: number
-	Category: string | null
-}
-
-type InternshipResponse = {
-	internship: InternshipDetails
-	tags: InternshipTag[]
-}
-
-const route = useRoute()
-const internshipId = computed(() => {
-	const param = route.params.id
-	return Array.isArray(param) ? param[0] ?? '' : param ?? ''
-})
-
-const { data, pending, error } = await useFetch<InternshipResponse>(
-	() => `/api/internships/${encodeURIComponent(internshipId.value)}`,
-)
-
-function formatDate(value: string | null) {
-	return value ? value.split(' ')[0] : 'Not specified'
-}
-
-function isHttpLink(value: string | null): value is string {
-	return value !== null && /^https?:\/\//i.test(value)
-}
+	import { useInternshipPage } from '~/composables/id';
+	
+	const { data, pending, error } = useInternshipPage()
 </script>
 
 <template>
