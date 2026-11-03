@@ -62,7 +62,19 @@ export const useIndexPage = () => {
             .sort((a, b) => Date.parse(b.PostDate ?? '') - Date.parse(a.PostDate ?? ''))
     })
 
-    return { pending, error, tagFilters, tagCategories, internships }
+    // Use the query reactive to the search bar to filter
+    const query = ref('')
+
+    const filteredInternships = computed(() =>
+        internships.value.filter( internship =>
+            // Include all matching titles, employer names, and employer companies
+            internship.Title.toLowerCase().includes(query.value.toLowerCase()) ||
+            internship.EmployerName?.toLowerCase().includes(query.value.toLowerCase()) ||
+            internship.EmployerCompany?.toLowerCase().includes(query.value.toLowerCase())
+        )
+    )
+
+    return { pending, error, tagFilters, tagCategories, query, filteredInternships }
 }
 
 
