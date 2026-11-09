@@ -47,6 +47,20 @@
 							{{ formatDescription(internship.Description) }}
 						</p>
 
+								<h3 class="text-xl font-bold text-[color:var(--primary-text)]">
+									{{ internship.Title }}
+								</h3>
+							</NuxtLink>
+
+							<p class="text-[color:var(--secondary-text)]">
+								{{ internship.EmployerName }}
+								<span v-if="internship.EmployerCompany"> · {{ internship.EmployerCompany }}</span>
+							</p>
+
+							<p class="mt-2 text-[color:var(--secondary-text)]">
+								{{ internship.Description || 'No description provided.' }}
+							</p>
+
 							<div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[color:var(--secondary-text)]">
 								<span>Posted: {{ formatDate(internship.PostDate) }}</span>
 								<span>Expires: {{ formatDate(internship.ExpDate) }}</span>
