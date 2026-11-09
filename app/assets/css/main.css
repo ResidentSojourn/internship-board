@@ -26,3 +26,10 @@
     display: inline-block;
     min-width: 4ch;
 }
+
+@layer components {
+    .link-title {
+        @apply text-xl font-bold hover:underline;
+        color: var(--primary-text);
+    }
+}

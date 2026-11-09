@@ -98,3 +98,13 @@ export function formatDate(value: string | null) {
 export function isHttpLink(value: string | null): value is string {
     return value !== null && /^https?:\/\//i.test(value)
 }
+
+export function formatDescription(description: string | null) {
+		if (!description) {
+			return 'No description provided.'
+		}
+
+		return description.length > 280
+			? `${description.slice(0, 277)}...`
+			: description
+	}
