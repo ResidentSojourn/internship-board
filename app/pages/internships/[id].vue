@@ -19,7 +19,7 @@
 					{{ data.internship.Title }}
 				</h1>
 
-				<p class="mt-1 text-[color:var(--secondary-text)]">
+				<p class="mt-1 font-semibold text-[color:var(--secondary-text)]">
 					{{ data.internship.EmployerName }}
 					<span v-if="data.internship.EmployerCompany"> · {{ data.internship.EmployerCompany }}</span>
 				</p>
@@ -54,7 +54,7 @@
 								rel="noopener noreferrer"
 								class="text-[color:var(--primary-text)] underline"
 							>
-								Open internship link
+								View internship
 							</a>
 						</dd>
 					</div>
@@ -64,14 +64,14 @@
 
 		<aside class="col-span-1 rounded-lg bg-[var(--secondary-background)]
 				ring-2 ring-[var(--secondary-border)] p-4 text-[color:var(--secondary-text)]">
-			<h2 class="font-bold text-[color:var(--primary-text)]">Internship tags</h2>
-			<p v-if="pending" class="mt-2">Loading tags...</p>
-			<p v-else-if="error" class="mt-2">Tags are unavailable.</p>
-			<p v-else-if="data?.tags.length === 0" class="mt-2">No tags assigned.</p>
+			<h2 class="font-bold text-[color:var(--primary-text)]">Internship Details:</h2>
+			<p v-if="pending" class="mt-2">Loading details...</p>
+			<p v-else-if="error" class="mt-2">Details are unavailable.</p>
+			<p v-else-if="data?.tags.length === 0" class="mt-2">No details available.</p>
 			<ul v-else-if="data" class="mt-2 space-y-2">
 				<li v-for="tag in data.tags" :key="tag.TagID">
-					<span class="text-[color:var(--secondary-text)]">{{ tag.Category || 'Other' }}:</span>
-					<span class="ml-1 text-[color:var(--primary-text)]">{{ tag.TagTitle }}</span>
+					<!-- <span class="text-[color:var(--secondary-text)]">{{ tag.Category || 'Other' }}:</span> -->
+					<span class="ml-1 font-semibold text-[color:var(--primary-text)]">{{ tag.TagTitle }}</span>
 				</li>
 			</ul>
 		</aside>

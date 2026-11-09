@@ -17,9 +17,13 @@
 				</template>
 
 				<!-- Hide the middle title if isSuperAdmin since there are too many buttons -->>
-				<h1 v-if="!isSuperAdmin()" class="text-xl text-[var(--primary-text)] font-bold tracking-tight">
-					INTERNSHIP BOARD
-				</h1>
+				<div v-if="!isSuperAdmin()" class="flex items-center justify-center gap-3">
+					<img src="/assets/images/LETUlogo.png" alt="Left logo" class="h-8 w-auto" />
+					<h1 class="text-xl text-[var(--primary-text)] font-bold tracking-tight">
+						INTERNSHIP BOARD
+					</h1>
+					<img src="/assets/images/LETUlogo.png" alt="Right logo" class="h-8 w-auto" />
+				</div>
 
 				<template #right>
 					<UNavigationMenu :items="items" :ui="{ linkLabel: 'text-lg text-[var(--secondary-text)] font-bold tracking-wider' }"/>

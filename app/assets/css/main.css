@@ -2,12 +2,21 @@
 @import "@nuxt/ui";
 
 :root {
+    /* The primary background for the main content of the page */
     --background: #607381;
+
+    /* Used across the page on elements such as header and panels */
     --primary-text: #e6e3e3;
 
+    /* Used for main content framing, such as header */
     --deep-background: #2C404F;
     --deep-border: #21303b;
 
+    /* Used for search bar to contrast with background and deep */
+    --light-background: #7a8d9b;
+    --light-text: #eeeeee;
+
+    /* Used for main content panels like internships and tags */
     --secondary-background: #3e5769;
     --secondary-border: #21303b;
     --secondary-text: #cccccc;
