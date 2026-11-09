@@ -3,6 +3,16 @@
 	import { useIndexPage } from '~/composables/index';
 	
 	const { pending, error, tagFilters, tagCategories, query, filteredInternships } = useIndexPage()
+
+	const formatDescription = (description: string | null) => {
+		if (!description) {
+			return 'No description provided.'
+		}
+
+		return description.length > 280
+			? `${description.slice(0, 277)}...`
+			: description
+	}
 </script>
 
 <template>
@@ -23,6 +33,20 @@
 								rounded-lg ring-2 ring-[var(--secondary-border)] p-4">
 
 							<NuxtLink :to="`/internships/${internship.InternshipID}`">
+								<h3 class="text-xl font-bold text-[color:var(--primary-text)] hover:underline">
+									{{ internship.Title }}
+								</h3>
+							</NuxtLink>
+
+							<p class="text-[color:var(--secondary-text)]">
+								{{ internship.EmployerName }}
+								<span v-if="internship.EmployerCompany"> · {{ internship.EmployerCompany }}</span>
+							</p>
+
+						<p class="mt-2 text-[color:var(--secondary-text)]">
+							{{ formatDescription(internship.Description) }}
+						</p>
+
 								<h3 class="text-xl font-bold text-[color:var(--primary-text)]">
 									{{ internship.Title }}
 								</h3>
@@ -63,16 +87,18 @@
 			<p v-if="pending">Loading filters...</p>
 			<ul v-else class="space-y-4">
 				<li v-for="category in tagCategories" :key="category.id">
-					<h2 class="font-bold">{{ category.name }}</h2>
-					<ul class="mt-2 space-y-1">
-						<li v-for="tag in category.tags" :key="tag.TagID">
-							<UCheckbox
-								v-model="tagFilters[tag.TagID]"
-								:label="tag.TagTitle"
-								:ui="{ label: 'text-[color:var(--primary-text)]' }"
-							/>
-						</li>
-					</ul>
+					<details>
+						<summary class="cursor-pointer font-bold">{{ category.name }}</summary>
+						<ul class="mt-2 space-y-1">
+							<li v-for="tag in category.tags" :key="tag.TagID">
+								<UCheckbox
+									v-model="tagFilters[tag.TagID]"
+									:label="tag.TagTitle"
+									:ui="{ label: 'text-[color:var(--primary-text)]' }"
+								/>
+							</li>
+						</ul>
+					</details>
 				</li>
 			</ul>
 		</div>

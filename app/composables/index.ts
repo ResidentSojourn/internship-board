@@ -79,7 +79,20 @@ export const useIndexPage = () => {
 
 
 export function formatDate(value: string | null) {
-    return value ? value.split(' ')[0] : 'Not specified'
+    if (!value) {
+        return 'Not specified'
+    }
+
+    const date = /^(\d{4})-(\d{2})-(\d{2})/.exec(value)
+    if (!date) {
+        return value.split(' ')[0]
+    }
+
+    return new Intl.DateTimeFormat('en-US', {
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC',
+    }).format(new Date(Date.UTC(Number(date[1]), Number(date[2]) - 1, Number(date[3]))))
 }
 
 export function isHttpLink(value: string | null): value is string {
