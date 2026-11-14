@@ -24,3 +24,19 @@ export type InternshipTag = {
     InternshipID: number
     TagID: number
 }
+
+export type IndexPageData = {
+    Internships: Internship[]
+    Tags: Tag[]
+    InterTags: InternshipTag[]
+}
+
+export type InternshipForm = Omit<
+    Internship,
+    'Title' | 'Description' | 'ExpDate' | 'Link'
+> & {
+    Title: string
+    Description: string
+    ExpDate: string
+    Link: string
+}

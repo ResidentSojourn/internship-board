@@ -13,20 +13,5 @@ export const useInternshipPage = () => {
         { key: `internship-${id}` }
     )
 
-    const form = ref<Internship>()
-
-    watchEffect(() => {
-        if (data.value?.internship) {
-            form.value = { ...data.value.internship }
-        }
-    })
-
-    const updateInternship = async () => {
-        await $fetch(`/api/internships/${route.params.id}`, {
-            method: 'PUT',
-            body: form
-        })
-    }
-
-    return { data, pending, error, form, updateInternship }
+    return { data, pending, error }
 }

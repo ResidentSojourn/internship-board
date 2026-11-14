@@ -2,16 +2,28 @@
 <script setup lang="ts">
 	import { useAdminDashboardPage } from '~/composables/adminDashboard.ts';
 	
-	const { pending, error, query, filteredInternships, confirmDelete } = useAdminDashboardPage()
+	const { pending, error, query, filteredInternships } = useAdminDashboardPage()
 </script>
 
 <template>
 	<p v-if="pending" class="text-[color:var(--secondary-text)]">Loading internships...</p>
 	<p v-else-if="error" class="text-[color:var(--secondary-text)]">Could not load internships. Please try again later.</p>
 	<div v-else class="space-y-3">
-		<input v-model="query" placeholder="Search Internships" style="width: 100%"
-				class="bg-[var(--light-background)] text-[color:var(--light-text)]
-				rounded-lg ring-2 ring-[var(--light-background)] p-4" />
+		<div class="flex items-center gap-3">
+			<input
+				v-model="query"
+				placeholder="Search Internships"
+				class="flex-1 min-w-0 bg-[var(--light-background)] text-[color:var(--light-text)]
+				rounded-lg ring-2 ring-[var(--light-background)] p-4"
+			/>
+
+			<UButton
+				class="button bg-[color:var(--new)] hover:[color:var(--light-new)]"
+				@click="navigateTo('/internships/new')"
+			>
+				New
+			</UButton>
+		</div>
 
 		<p v-if="!filteredInternships?.length" class="text-[color:var(--secondary-text)]">
             No internships found.
@@ -44,7 +56,7 @@
 
                         <a href="#"
                                 @click.prevent="confirmDelete(internship.InternshipID)">
-                            <h3 class="link-title">
+                            <h3 class="link-title warningText">
                                 DELETE
                             </h3>
                         </a>

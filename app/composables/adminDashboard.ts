@@ -31,16 +31,23 @@ export const useAdminDashboardPage = () => {
         )
     )
 
-    // Internship deletion logic
-    const confirmDelete = async (internshipId: number) => {
-        const confirmed = window.confirm(
-            'Are you sure you want to delete this internship?'
-        )
+    return { pending, error, query, filteredInternships }
+}
 
-        if (!confirmed) return
+export async function confirmDelete(internshipId: number) {
+    const confirmed = window.confirm(
+        'Are you sure you want to delete this internship?'
+    )
 
-        // Delete internship stub
+    if (!confirmed) return
+
+    try {
+        await $fetch(`/api/internships/${encodeURIComponent(internshipId)}`, {
+            method: 'DELETE'
+        })
+
+        await navigateTo('/adminDashboard')
+    } catch (error) {
+        console.error('Error deleting internship:', error)
     }
-
-    return { pending, error, query, filteredInternships, confirmDelete }
 }

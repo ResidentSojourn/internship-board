@@ -1,0 +1,124 @@
+export const useEditInternship = () => {
+    const form = ref<InternshipForm>()
+    
+    // Get internship from URL
+    const route = useRoute()
+    const raw = route.params.id
+    const id = Array.isArray(raw) ? raw[0] ?? '' : raw ?? ''
+
+    // Fetch internship
+    const { data, pending, error, refresh } = useFetch<InternshipResponse>(
+        `/api/internships/${encodeURIComponent(id)}`,
+        { key: `internship-${id}` }
+    )
+
+    // Fetch all tags
+    const { data: allTags, pending: tagsPending, error: tagsError } =
+        useFetch<Tag[]>('/api/tags')
+
+    // Track currently selected tags
+    const selectedTags = reactive<Record<number, boolean>>({})
+
+    // Organize tags by category
+    const tagCategories = computed(() => {
+        const categories = new Map<
+            number,
+            { id: number, name: string, tags: Tag[] }
+        >()
+
+        for (const tag of allTags.value ?? []) {
+            let category = categories.get(tag.CategoryID)
+
+            if (!category) {
+                category = {
+                    id: tag.CategoryID,
+                    name: tag.Category ?? 'Other',
+                    tags: [],
+                }
+
+                categories.set(tag.CategoryID, category)
+            }
+
+            category.tags.push(tag)
+        }
+
+        return [...categories.values()]
+    })
+
+    // Initialize checkbox values from existing internship tags
+    watch(
+        () => data.value?.tags,
+        (tags) => {
+            if (!tags) return
+
+            // Clear previous selections
+            Object.keys(selectedTags).forEach(key => {
+                delete selectedTags[Number(key)]
+            })
+
+            tags.forEach(tag => {
+                selectedTags[tag.TagID] = true
+            })
+        },
+        { immediate: true }
+    )
+
+    // Get all selected tag IDs
+    const selectedTagIDs = computed(() =>
+        Object.entries(selectedTags)
+            .filter(([_, selected]) => selected)
+            .map(([tagID]) => Number(tagID))
+    )
+
+    // Make editable internship fields
+    watch(
+    () => data.value?.internship,
+    (internship) => {
+        if (internship && !form.value) {
+            form.value = {
+                ...internship,
+                Title: internship.Title ?? '',
+                Description: internship.Description ?? '',
+                ExpDate: internship.ExpDate ?? '',
+                Link: internship.Link ?? '',
+            }
+        }
+    },
+    { immediate: true }
+)
+
+    // Update internship
+    const updateInternship = async () => {
+        if (!form.value) return
+
+        try {
+            const response = await $fetch(
+                `/api/internships/${encodeURIComponent(id)}`,
+                {
+                    method: 'PUT',
+                    body: {
+                        ...form.value,
+                        tagIDs: selectedTagIDs.value,
+                    },
+                }
+            )
+
+            console.log('Internship updated:', response)
+            
+            await navigateTo('/adminDashboard')
+        } catch (error) {
+            console.error('Error updating internship:', error)
+        }
+    }
+
+    return {
+        data,
+        pending,
+        error,
+        form,
+        tagCategories,
+        selectedTags,
+        selectedTagIDs,
+        updateInternship
+    }
+}

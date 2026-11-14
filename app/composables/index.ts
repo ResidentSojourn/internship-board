@@ -1,11 +1,5 @@
 import type { Internship, Tag, InternshipTag } from '~/composables/database'
 
-type IndexPageData = {
-    Internships: Internship[]
-    Tags: Tag[]
-    InterTags: InternshipTag[]
-}
-
 export const useIndexPage = () => {
     const { data, pending, error } = useFetch<IndexPageData>('/api/mainPageData')
     const tagFilters = reactive<Record<number, boolean>>({})

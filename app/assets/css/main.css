@@ -20,6 +20,41 @@
     --secondary-background: #3e5769;
     --secondary-border: #21303b;
     --secondary-text: #cccccc;
+
+    /* Used for cancel/back buttons */
+    --back: gray;
+    --light-back: rgb(141, 141, 141);
+
+    /* Used for delete buttons */
+    --warning: rgb(255, 38, 38);
+    --light-warning: rgb(245, 107, 107);
+
+    /* Used for new/create buttons */
+    --new: green;
+    --light-new: rgb(20, 150, 20);
+}
+
+.button {
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  color: var(--secondary-text);
+  transition: all 200ms;
+}
+
+.button:hover {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.button:active {
+  transform: scale(0.95);
+}   
+
+.warningText {
+    color: var(--warning);
+}
+
+.warningText:hover {
+    color: var(--light-warning);
 }
 
 .gap {
