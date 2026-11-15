@@ -3,7 +3,7 @@ export type Role = 'none' | 'admin' | 'superAdmin'
 export function authorization() {
   const role = useState<Role>('role', () => 'admin') // Should be 'none' outside of testing
   
-  const facID : number = 1 // Should be blank by default
+  const facID : number = 3 // Should be blank by default
 
   function logout() {
     role.value = 'none'

@@ -25,6 +25,13 @@ export type InternshipTag = {
     TagID: number
 }
 
+export type Faculty = {
+    FacultyID: number
+    Email: string
+    isAdmin: number
+    isActive: number
+}
+
 export type IndexPageData = {
     Internships: Internship[]
     Tags: Tag[]

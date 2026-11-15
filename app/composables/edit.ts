@@ -1,5 +1,13 @@
 export const useEditInternship = () => {
     const form = ref<InternshipForm>()
+    const { getFacultyID } = authorization()
+    const {
+        data: currentFaculty,
+        pending: facultyPending
+    } = useFetch<{ isAdmin: boolean, faculty: unknown[] }>('/api/adminDashboardFaculty', {
+        query: { facultyID: getFacultyID() }
+    })
+    const isAdmin = computed(() => currentFaculty.value?.isAdmin === true)
     
     // Get internship from URL
     const route = useRoute()
@@ -99,6 +107,7 @@ export const useEditInternship = () => {
                     body: {
                         ...form.value,
                         tagIDs: selectedTagIDs.value,
+                        requesterFacultyID: getFacultyID(),
                     },
                 }
             )
@@ -108,6 +117,7 @@ export const useEditInternship = () => {
             await navigateTo('/adminDashboard')
         } catch (error) {
             console.error('Error updating internship:', error)
+            window.alert('Could not update internship. Please try again later.')
         }
     }
 
@@ -119,6 +129,8 @@ export const useEditInternship = () => {
         tagCategories,
         selectedTags,
         selectedTagIDs,
+        facultyPending,
+        isAdmin,
         updateInternship
     }
 }

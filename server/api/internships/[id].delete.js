@@ -1,8 +1,5 @@
 
-import { resolve } from 'node:path'
-import sqlite3 from 'sqlite3'
-
-const databasePath = resolve(process.cwd(), 'app', 'database', 'db.sqlite')
+import { assertCanManageInternship, openFacultyDatabase } from '../../utils/facultyDatabase.js'
 
 export default defineEventHandler(async (event) => {
     const rawId = getRouterParam(event, 'id')
@@ -23,16 +20,17 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    const db = await new Promise((resolve, reject) => {
-        const database = new sqlite3.Database(
-            databasePath,
-            sqlite3.OPEN_READWRITE,
-            (error) => {
-                if (error) reject(error)
-                else resolve(database)
-            }
-        )
-    })
+    const body = await readBody(event)
+    const requesterFacultyID = Number(body?.requesterFacultyID)
+
+    if (!Number.isSafeInteger(requesterFacultyID) || requesterFacultyID < 1) {
+        throw createError({
+            statusCode: 400,
+            statusMessage: 'Invalid requester faculty ID'
+        })
+    }
+
+    const db = await openFacultyDatabase()
 
     const run = (sql, params = []) =>
         new Promise((resolve, reject) => {
@@ -53,17 +51,7 @@ export default defineEventHandler(async (event) => {
     try {
         await run('BEGIN TRANSACTION')
 
-        const internship = await get(
-            'SELECT InternshipID FROM Internship WHERE InternshipID = ?',
-            [internshipId]
-        )
-
-        if (!internship) {
-            throw createError({
-                statusCode: 404,
-                statusMessage: 'Internship not found'
-            })
-        }
+        await assertCanManageInternship(db, internshipId, requesterFacultyID)
 
         // Remove associated tag assignments first.
         await run(

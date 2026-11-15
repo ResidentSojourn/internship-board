@@ -1,8 +1,6 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 export function getNavigationItems() {
-    const route = useRoute()
-
     // Pull authorization / login state
     const { isAdmin, isSuperAdmin, logout } = authorization()
 
@@ -14,11 +12,6 @@ export function getNavigationItems() {
                 {
                     label: 'BOARD CONFIGURATION',
                     to: '/boardConfiguration',
-                    active: false
-                },
-                {
-                    label: 'BOARD ADMINS',
-                    to: '/admins',
                     active: false
                 }
             )

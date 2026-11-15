@@ -1,8 +1,5 @@
 
-import { resolve } from 'node:path'
-import sqlite3 from 'sqlite3'
-
-const databasePath = resolve(process.cwd(), 'app', 'database', 'db.sqlite')
+import { assertCanManageInternship, openFacultyDatabase } from '../../utils/facultyDatabase.js'
 
 export default defineEventHandler(async (event) => {
   // Validate the internship ID from the URL
@@ -40,7 +37,15 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Validate and remove duplicate tag IDs
+  const requesterFacultyID = Number(body.requesterFacultyID)
+
+  if (!Number.isSafeInteger(requesterFacultyID) || requesterFacultyID < 1) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid requester faculty ID',
+    })
+  }
+
   const tagIDs = [...new Set(body.tagIDs.map(Number))]
 
   if (!tagIDs.every(id => Number.isSafeInteger(id) && id > 0)) {
@@ -50,17 +55,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Open the database with write permissions
-  const db = await new Promise((resolve, reject) => {
-    const database = new sqlite3.Database(
-      databasePath,
-      sqlite3.OPEN_READWRITE,
-      (openError) => {
-        if (openError) reject(openError)
-        else resolve(database)
-      }
-    )
-  })
+  const db = await openFacultyDatabase()
 
   const query = (sql, params = []) =>
     new Promise((resolve, reject) => {
@@ -81,18 +76,7 @@ export default defineEventHandler(async (event) => {
   try {
     await run('BEGIN TRANSACTION')
 
-    // Verify that the internship exists
-    const internships = await query(
-      'SELECT InternshipID FROM Internship WHERE InternshipID = ?',
-      [internshipId]
-    )
-
-    if (internships.length === 0) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Internship not found',
-      })
-    }
+    await assertCanManageInternship(db, internshipId, requesterFacultyID)
 
     // Get the actual columns in the Internship table
     const columns = await query('PRAGMA table_info(Internship)')
@@ -105,6 +89,8 @@ export default defineEventHandler(async (event) => {
     // Ignore joined fields, tagIDs, and the primary key
     const fields = Object.keys(body).filter(key =>
       key !== 'InternshipID' &&
+      key !== 'FacultyID' &&
+      key !== 'requesterFacultyID' &&
       key !== 'tagIDs' &&
       allowedColumns.has(key)
     )

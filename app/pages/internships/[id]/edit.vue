@@ -6,6 +6,8 @@ const {
     form,
     tagCategories,
     selectedTags,
+    facultyPending,
+    isAdmin,
     updateInternship
 } = useEditInternship()
 
@@ -15,7 +17,9 @@ const { getFacultyID } = authorization()
 
 watchEffect(() => {
     if (
+        !facultyPending.value &&
         data.value?.internship &&
+        !isAdmin.value &&
         data.value.internship.FacultyID !== getFacultyID()
     ) {
         throw createError({
@@ -27,8 +31,11 @@ watchEffect(() => {
 </script>
 
 <template>
+    <p v-if="facultyPending" class="text-[color:var(--secondary-text)]">
+        Verifying faculty access...
+    </p>
     <InternshipForm
-        v-if="form"
+        v-else-if="form"
         :form="form"
         :tag-categories="tagCategories"
         :selected-tags="selectedTags"
