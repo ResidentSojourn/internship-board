@@ -41,11 +41,19 @@ export default defineEventHandler(async (event) => {
   try {
     [internships, tags] = await Promise.all([
       query(`
-        SELECT Internship.*,
+        SELECT
+          Internship.InternshipID,
+          Internship.EmployerID,
+          Internship.FacultyID AS AdminID,
+          Internship.Title,
+          Internship.Description,
+          Internship.PostDate,
+          Internship.ExpDate,
+          Internship.Link,
           Employer.Name AS EmployerName,
           Employer.Company AS EmployerCompany,
           Employer.Contact AS EmployerContact,
-          Faculty.Email AS FacultyEmail
+          Faculty.Email AS AdminEmail
         FROM Internship
         LEFT JOIN Employer ON Employer.EmployerID = Internship.EmployerID
         LEFT JOIN Faculty ON Faculty.FacultyID = Internship.FacultyID

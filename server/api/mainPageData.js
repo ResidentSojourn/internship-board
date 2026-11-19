@@ -28,7 +28,17 @@ export default defineEventHandler(async () => {
   try {
     const [Internships, Tags, InterTags] = await Promise.all([
       query(`
-        SELECT Internship.*, Employer.Name AS EmployerName, Employer.Company AS EmployerCompany
+        SELECT
+          Internship.InternshipID,
+          Internship.EmployerID,
+          Internship.FacultyID AS AdminID,
+          Internship.Title,
+          Internship.Description,
+          Internship.PostDate,
+          Internship.ExpDate,
+          Internship.Link,
+          Employer.Name AS EmployerName,
+          Employer.Company AS EmployerCompany
         FROM Internship
         LEFT JOIN Employer ON Employer.EmployerID = Internship.EmployerID
       `),

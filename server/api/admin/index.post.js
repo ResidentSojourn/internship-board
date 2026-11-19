@@ -1,4 +1,4 @@
-import { openFacultyDatabase } from '../../utils/facultyDatabase.js'
+import { openFacultyDatabase as openAdminDatabase } from '../../utils/facultyDatabase.js'
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default defineEventHandler(async (event) => {
@@ -9,18 +9,18 @@ export default defineEventHandler(async (event) => {
   }
 
   const email = typeof body.Email === 'string' ? body.Email.trim() : ''
-  const requesterFacultyID = Number(body.requesterFacultyID)
+  const requesterAdminID = Number(body.requesterAdminID)
 
   if (
     !emailPattern.test(email) ||
-    !Number.isSafeInteger(requesterFacultyID) ||
-    requesterFacultyID < 1 ||
-    typeof body.isAdmin !== 'boolean'
+    !Number.isSafeInteger(requesterAdminID) ||
+    requesterAdminID < 1 ||
+    typeof body.isSuperAdmin !== 'boolean'
   ) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid faculty information' })
+    throw createError({ statusCode: 400, statusMessage: 'Invalid admin information' })
   }
 
-  const db = await openFacultyDatabase()
+  const db = await openAdminDatabase()
 
   const get = (sql, params = []) => new Promise((resolve, reject) => {
     db.get(sql, params, (queryError, row) => {
@@ -47,32 +47,32 @@ export default defineEventHandler(async (event) => {
 
     const requester = await get(
       'SELECT isAdmin FROM Faculty WHERE FacultyID = ?',
-      [requesterFacultyID]
+      [requesterAdminID]
     )
 
     if (!requester || Number(requester.isAdmin) !== 1) {
       throw createError({ statusCode: 403, statusMessage: 'Admin access required' })
     }
 
-    const existingFaculty = await get(
+    const existingAdmin = await get(
       'SELECT FacultyID FROM Faculty WHERE Email = ? COLLATE NOCASE',
       [email]
     )
 
-    if (existingFaculty) {
-      throw createError({ statusCode: 409, statusMessage: 'Faculty email already exists' })
+    if (existingAdmin) {
+      throw createError({ statusCode: 409, statusMessage: 'Admin email already exists' })
     }
 
     const result = await run(
       'INSERT INTO Faculty (Email, isAdmin, isActive) VALUES (?, ?, 1)',
-      [email, body.isAdmin ? 1 : 0]
+      [email, body.isSuperAdmin ? 1 : 0]
     )
 
     await run('COMMIT')
 
     return {
       success: true,
-      FacultyID: result.lastID
+      AdminID: result.lastID
     }
   } catch (error) {
     try {

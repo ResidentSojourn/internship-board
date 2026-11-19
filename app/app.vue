@@ -1,6 +1,5 @@
 <script setup lang="ts">
 	const { items } = getNavigationItems()
-	const { isSuperAdmin } = authorization()
 </script>
 
 <template>
@@ -15,8 +14,7 @@
 					</NuxtLink>
 				</template>
 
-				<!-- Hide the middle title if isSuperAdmin since there are too many buttons -->>
-				<div v-if="!isSuperAdmin()" class="flex items-center justify-center gap-3">
+				<div class="flex items-center justify-center gap-3">
 					<img src="/assets/images/LETUlogo.png" alt="Left logo" class="h-8 w-auto" />
 					<h1 class="text-xl text-[var(--primary-text)] font-bold tracking-tight">
 						INTERNSHIP BOARD

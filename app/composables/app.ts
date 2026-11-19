@@ -2,20 +2,8 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 
 export function getNavigationItems() {
     // Pull authorization / login state
-    const { isAdmin, isSuperAdmin, logout } = authorization()
-
     const items = computed<NavigationMenuItem[]>(() => {
         const itemList: NavigationMenuItem[] = []
-
-        if (isSuperAdmin()) {
-            itemList.push(
-                {
-                    label: 'BOARD CONFIGURATION',
-                    to: '/boardConfiguration',
-                    active: false
-                }
-            )
-        }
         
         if (isAdmin()) {
             itemList.push(

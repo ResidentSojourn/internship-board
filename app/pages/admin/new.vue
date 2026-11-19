@@ -1,32 +1,31 @@
 <script setup lang="ts">
-import type { Faculty } from '~/composables/database'
+import { useCreateAdmin } from '~/composables/adminDashboard'
 
-const { getFacultyID } = authorization()
 const { data: adminData, pending: adminCheckPending, error: adminCheckError } = await useFetch<{
     isAdmin: boolean
-    faculty: Faculty[]
-}>('/api/adminDashboardFaculty', {
-    query: { facultyID: getFacultyID() }
+    admins: Admin[]
+}>('/api/adminDashboardAdmins', {
+    query: { adminID: getAdminID() }
 })
 
 if (adminCheckError.value || !adminData.value?.isAdmin) {
     await navigateTo('/adminDashboard')
 }
 
-const { form, pending, error, createFaculty } = useCreateFaculty()
+const { form, pending, error, createAdmin } = useCreateAdmin()
 </script>
 
 <template>
     <p v-if="adminCheckPending" class="text-[color:var(--secondary-text)]">
         Verifying admin access...
     </p>
-    <FacultyForm
+    <AdminForm
         v-else-if="adminData?.isAdmin"
         :form="form"
         :pending="pending"
         :error="error"
         mode="create"
-        @save="createFaculty"
+        @save="createAdmin"
         @cancel="navigateTo('/adminDashboard')"
     />
 </template>

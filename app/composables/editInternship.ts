@@ -1,13 +1,10 @@
 export const useEditInternship = () => {
     const form = ref<InternshipForm>()
-    const { getFacultyID } = authorization()
     const {
-        data: currentFaculty,
-        pending: facultyPending
-    } = useFetch<{ isAdmin: boolean, faculty: unknown[] }>('/api/adminDashboardFaculty', {
-        query: { facultyID: getFacultyID() }
-    })
-    const isAdmin = computed(() => currentFaculty.value?.isAdmin === true)
+        data: currentAdmin,
+        pending: adminPending
+    } = useAdminData()
+    const isAdmin = computed(() => currentAdmin.value?.isAdmin === true)
     
     // Get internship from URL
     const route = useRoute()
@@ -15,14 +12,10 @@ export const useEditInternship = () => {
     const id = Array.isArray(raw) ? raw[0] ?? '' : raw ?? ''
 
     // Fetch internship
-    const { data, pending, error, refresh } = useFetch<InternshipResponse>(
-        `/api/internships/${encodeURIComponent(id)}`,
-        { key: `internship-${id}` }
-    )
+    const { data, pending, error, refresh } = useInternship(Number(id))
 
     // Fetch all tags
-    const { data: allTags, pending: tagsPending, error: tagsError } =
-        useFetch<Tag[]>('/api/tags')
+    const { data: allTags, pending: tagsPending, error: tagsError } = useAllTags()
 
     // Track currently selected tags
     const selectedTags = reactive<Record<number, boolean>>({})
@@ -96,21 +89,11 @@ export const useEditInternship = () => {
 )
 
     // Update internship
-    const updateInternship = async () => {
+    const updateInternshipByForm = async () => {
         if (!form.value) return
 
         try {
-            const response = await $fetch(
-                `/api/internships/${encodeURIComponent(id)}`,
-                {
-                    method: 'PUT',
-                    body: {
-                        ...form.value,
-                        tagIDs: selectedTagIDs.value,
-                        requesterFacultyID: getFacultyID(),
-                    },
-                }
-            )
+            const response = await updateInternship(form.value, selectedTagIDs.value, Number(id))
 
             console.log('Internship updated:', response)
             
@@ -129,8 +112,8 @@ export const useEditInternship = () => {
         tagCategories,
         selectedTags,
         selectedTagIDs,
-        facultyPending,
+        adminPending,
         isAdmin,
-        updateInternship
+        updateInternshipByForm
     }
 }

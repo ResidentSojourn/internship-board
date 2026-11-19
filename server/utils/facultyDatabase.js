@@ -62,7 +62,7 @@ export async function assertCanManageInternship(db, internshipId, requesterFacul
   })
 
   if (!requester) {
-    throw createError({ statusCode: 403, statusMessage: 'Faculty access required' })
+    throw createError({ statusCode: 403, statusMessage: 'Admin access required' })
   }
 
   const internship = await new Promise((resolve, reject) => {

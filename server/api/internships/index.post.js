@@ -18,8 +18,8 @@ export default defineEventHandler(async (event) => {
         typeof body.Title !== 'string' ||
         !body.Title.trim() ||
         !Array.isArray(body.tagIDs) ||
-        !Number.isSafeInteger(Number(body.FacultyID)) ||
-        Number(body.FacultyID) < 1
+        !Number.isSafeInteger(Number(body.AdminID)) ||
+        Number(body.AdminID) < 1
     ) {
         throw createError({
             statusCode: 400,
@@ -69,16 +69,16 @@ export default defineEventHandler(async (event) => {
     try {
         await run('BEGIN TRANSACTION')
 
-        // Verify faculty exists
-        const faculty = await query(
+        // Verify the admin exists
+        const admin = await query(
             'SELECT FacultyID FROM Faculty WHERE FacultyID = ?',
-            [body.FacultyID]
+            [body.AdminID]
         )
 
-        if (faculty.length === 0) {
+        if (admin.length === 0) {
             throw createError({
                 statusCode: 400,
-                statusMessage: 'Faculty member not found',
+                statusMessage: 'Admin not found',
             })
         }
 
@@ -109,7 +109,7 @@ export default defineEventHandler(async (event) => {
                 body.Description ?? '',
                 body.ExpDate || null,
                 body.Link ?? '',
-                body.FacultyID,
+                body.AdminID,
                 new Date().toISOString().slice(0, 10),
             ]
         )

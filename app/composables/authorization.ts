@@ -1,25 +1,27 @@
 export type Role = 'none' | 'admin' | 'superAdmin'
 
-export function authorization() {
-  const role = useState<Role>('role', () => 'admin') // Should be 'none' outside of testing
-  
-  const facID : number = 3 // Should be blank by default
+const role = ref<Role>('none')
 
-  function logout() {
-    role.value = 'none'
-  }
+const adminID = ref(0)
 
-  function isAdmin() {
-    return role.value === 'admin' || role.value === 'superAdmin'
-  }
+export function login(): void {
+  role.value = 'superAdmin'
+  adminID.value = 3
+}
 
-  function isSuperAdmin() {
-    return role.value === 'superAdmin'
-  }
+export function logout(): void {
+  role.value = 'none'
+  adminID.value = 0
+}
 
-  function getFacultyID() {
-    return facID
-  }
+export function isAdmin(): boolean {
+  return role.value === 'admin' || role.value === 'superAdmin'
+}
 
-  return { role, logout, isAdmin, isSuperAdmin, getFacultyID }
-}   
+export function isSuperAdmin(): boolean {
+  return role.value === 'superAdmin'
+}
+
+export function getAdminID(): number {
+  return adminID.value
+}

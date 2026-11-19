@@ -1,4 +1,4 @@
-import { openFacultyDatabase } from '../../utils/facultyDatabase.js'
+import { openFacultyDatabase as openAdminDatabase } from '../../utils/facultyDatabase.js'
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -7,27 +7,27 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
 
   if (!rawId || !/^\d+$/.test(rawId)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid faculty ID' })
+    throw createError({ statusCode: 400, statusMessage: 'Invalid admin ID' })
   }
 
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid request body' })
   }
 
-  const facultyId = Number(rawId)
-  const requesterFacultyID = Number(body.requesterFacultyID)
+  const adminID = Number(rawId)
+  const requesterAdminID = Number(body.requesterAdminID)
   const email = typeof body.Email === 'string' ? body.Email.trim() : ''
 
   if (
-    !Number.isSafeInteger(facultyId) || facultyId < 1 ||
-    !Number.isSafeInteger(requesterFacultyID) || requesterFacultyID < 1 ||
+    !Number.isSafeInteger(adminID) || adminID < 1 ||
+    !Number.isSafeInteger(requesterAdminID) || requesterAdminID < 1 ||
     !emailPattern.test(email) ||
-    typeof body.isAdmin !== 'boolean'
+    typeof body.isSuperAdmin !== 'boolean'
   ) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid faculty information' })
+    throw createError({ statusCode: 400, statusMessage: 'Invalid admin information' })
   }
 
-  const db = await openFacultyDatabase()
+  const db = await openAdminDatabase()
   const get = (sql, params = []) => new Promise((resolve, reject) => {
     db.get(sql, params, (queryError, row) => {
       if (queryError) reject(queryError)
@@ -46,38 +46,38 @@ export default defineEventHandler(async (event) => {
 
     const requester = await get(
       'SELECT isAdmin FROM Faculty WHERE FacultyID = ?',
-      [requesterFacultyID]
+      [requesterAdminID]
     )
 
     if (!requester || Number(requester.isAdmin) !== 1) {
       throw createError({ statusCode: 403, statusMessage: 'Admin access required' })
     }
 
-    const faculty = await get(
+    const admin = await get(
       'SELECT FacultyID FROM Faculty WHERE FacultyID = ? AND isActive = 1',
-      [facultyId]
+      [adminID]
     )
 
-    if (!faculty) {
-      throw createError({ statusCode: 404, statusMessage: 'Faculty member not found' })
+    if (!admin) {
+      throw createError({ statusCode: 404, statusMessage: 'Admin not found' })
     }
 
     const duplicate = await get(
       'SELECT FacultyID FROM Faculty WHERE Email = ? COLLATE NOCASE AND FacultyID != ?',
-      [email, facultyId]
+      [email, adminID]
     )
 
     if (duplicate) {
-      throw createError({ statusCode: 409, statusMessage: 'Faculty email already exists' })
+      throw createError({ statusCode: 409, statusMessage: 'Admin email already exists' })
     }
 
     await run(
       'UPDATE Faculty SET Email = ?, isAdmin = ? WHERE FacultyID = ? AND isActive = 1',
-      [email, body.isAdmin ? 1 : 0, facultyId]
+      [email, body.isSuperAdmin ? 1 : 0, adminID]
     )
     await run('COMMIT')
 
-    return { success: true, FacultyID: facultyId }
+    return { success: true, AdminID: adminID }
   } catch (error) {
     try {
       await run('ROLLBACK')

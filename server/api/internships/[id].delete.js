@@ -1,5 +1,5 @@
 
-import { assertCanManageInternship, openFacultyDatabase } from '../../utils/facultyDatabase.js'
+import { assertCanManageInternship, openFacultyDatabase as openAdminDatabase } from '../../utils/facultyDatabase.js'
 
 export default defineEventHandler(async (event) => {
     const rawId = getRouterParam(event, 'id')
@@ -21,16 +21,16 @@ export default defineEventHandler(async (event) => {
     }
 
     const body = await readBody(event)
-    const requesterFacultyID = Number(body?.requesterFacultyID)
+    const requesterAdminID = Number(body?.requesterAdminID)
 
-    if (!Number.isSafeInteger(requesterFacultyID) || requesterFacultyID < 1) {
+    if (!Number.isSafeInteger(requesterAdminID) || requesterAdminID < 1) {
         throw createError({
             statusCode: 400,
-            statusMessage: 'Invalid requester faculty ID'
+            statusMessage: 'Invalid requester admin ID'
         })
     }
 
-    const db = await openFacultyDatabase()
+    const db = await openAdminDatabase()
 
     const run = (sql, params = []) =>
         new Promise((resolve, reject) => {
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     try {
         await run('BEGIN TRANSACTION')
 
-        await assertCanManageInternship(db, internshipId, requesterFacultyID)
+        await assertCanManageInternship(db, internshipId, requesterAdminID)
 
         // Remove associated tag assignments first.
         await run(

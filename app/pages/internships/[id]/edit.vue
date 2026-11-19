@@ -6,21 +6,19 @@ const {
     form,
     tagCategories,
     selectedTags,
-    facultyPending,
+    adminPending,
     isAdmin,
-    updateInternship
+    updateInternshipByForm
 } = useEditInternship()
 
 import { confirmDelete } from '~/composables/adminDashboard'
 
-const { getFacultyID } = authorization()
-
 watchEffect(() => {
     if (
-        !facultyPending.value &&
+        !adminPending.value &&
         data.value?.internship &&
         !isAdmin.value &&
-        data.value.internship.FacultyID !== getFacultyID()
+        data.value.internship.AdminID !== getAdminID()
     ) {
         throw createError({
             statusCode: 403,
@@ -31,8 +29,8 @@ watchEffect(() => {
 </script>
 
 <template>
-    <p v-if="facultyPending" class="text-[color:var(--secondary-text)]">
-        Verifying faculty access...
+    <p v-if="adminPending" class="text-[color:var(--secondary-text)]">
+        Verifying admin access...
     </p>
     <InternshipForm
         v-else-if="form"
@@ -43,7 +41,7 @@ watchEffect(() => {
         :error="error"
         :show-delete="true"
         submit-label="Save Changes"
-        @save="updateInternship"
+        @save="updateInternshipByForm"
         @delete="confirmDelete(form.InternshipID)"
         @cancel="navigateTo('/adminDashboard')"
     />

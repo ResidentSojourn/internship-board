@@ -1,8 +1,8 @@
 <!-- Default page -->
 <script setup lang="ts">
-	import { useIndexPage } from '~/composables/index';
+	import { useHomePage } from '~/composables/home';
 	
-	const { pending, error, tagFilters, tagCategories, query, filteredInternships } = useIndexPage()
+	const { pending, error, tagFilters, tagCategories, query, filteredInternships } = useHomePage()
 </script>
 
 <template>

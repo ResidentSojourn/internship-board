@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useEditAdmin } from '~/composables/editAdmin'
+
 const {
     data,
     loading,
@@ -6,27 +8,27 @@ const {
     form,
     pending,
     error,
-    updateFaculty,
-    deactivateFaculty
-} = useEditFaculty()
+    updateAdminByForm,
+    deactivateAdmin
+} = useEditAdmin()
 </script>
 
 <template>
     <p v-if="loading" class="text-[color:var(--secondary-text)]">
-        Loading faculty member...
+        Loading admin...
     </p>
     <p v-else-if="loadError || !data" class="text-[color:var(--secondary-text)]">
-        Could not load this faculty member. They may no longer be active.
+        Could not load this admin. They may no longer be active.
     </p>
-    <FacultyForm
+    <AdminForm
         v-else
         :form="form"
         :pending="pending"
         :error="error"
         mode="edit"
         :show-deactivate="true"
-        @save="updateFaculty"
-        @deactivate="deactivateFaculty"
+        @save="updateAdminByForm"
+        @deactivate="deactivateAdmin"
         @cancel="navigateTo('/adminDashboard')"
     />
 </template>

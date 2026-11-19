@@ -1,7 +1,7 @@
-import type { Internship, Tag, InternshipTag } from '~/composables/database'
+export const useHomePage = () => {
+    const { data, pending, error } = useMainPageData()
 
-export const useIndexPage = () => {
-    const { data, pending, error } = useFetch<IndexPageData>('/api/mainPageData')
+    // Get tags under categories
     const tagFilters = reactive<Record<number, boolean>>({})
 
     const tagCategories = computed(() => {
@@ -39,28 +39,29 @@ export const useIndexPage = () => {
         return [...selectedByCategory.values()]
     })
 
+    // Get sorted internships
     const internships = computed(() => {
         const now = Date.now()
 
         return (data.value?.Internships ?? [])
-            .filter(internship => !internship.ExpDate || Date.parse(internship.ExpDate) >= now)
-            .filter(internship =>
+            .filter((internship: Internship) => !internship.ExpDate || Date.parse(internship.ExpDate) >= now)
+            .filter((internship : Internship) =>
                 selectedTagIdsByCategory.value.every(categoryTagIds =>
                     categoryTagIds.some(tagID =>
-                        data.value?.InterTags.some(tag =>
+                        data.value?.InterTags.some((tag : InternshipTag) =>
                             tag.InternshipID === internship.InternshipID && tag.TagID === tagID,
                         ),
                     ),
                 )
             )
-            .sort((a, b) => Date.parse(b.PostDate ?? '') - Date.parse(a.PostDate ?? ''))
+            .sort((a : Internship, b : Internship) => Date.parse(b.PostDate ?? '') - Date.parse(a.PostDate ?? ''))
     })
 
     // Use the query reactive to the search bar to filter
     const query = ref('')
 
     const filteredInternships = computed(() =>
-        internships.value.filter( internship =>
+        internships.value.filter( (internship : Internship) =>
             // Include all matching titles, employer names, and employer companies
             internship.Title.toLowerCase().includes(query.value.toLowerCase()) ||
             internship.EmployerName?.toLowerCase().includes(query.value.toLowerCase()) ||
@@ -94,11 +95,11 @@ export function isHttpLink(value: string | null): value is string {
 }
 
 export function formatDescription(description: string | null) {
-		if (!description) {
-			return 'No description provided.'
-		}
-
-		return description.length > 280
-			? `${description.slice(0, 277)}...`
-			: description
+	if (!description) {
+		return 'No description provided.'
 	}
+
+	return description.length > 280
+		    ? `${description.slice(0, 277)}...`
+			: description
+}

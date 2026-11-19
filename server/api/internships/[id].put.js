@@ -1,5 +1,5 @@
 
-import { assertCanManageInternship, openFacultyDatabase } from '../../utils/facultyDatabase.js'
+import { assertCanManageInternship, openFacultyDatabase as openAdminDatabase } from '../../utils/facultyDatabase.js'
 
 export default defineEventHandler(async (event) => {
   // Validate the internship ID from the URL
@@ -37,12 +37,12 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const requesterFacultyID = Number(body.requesterFacultyID)
+  const requesterAdminID = Number(body.requesterAdminID)
 
-  if (!Number.isSafeInteger(requesterFacultyID) || requesterFacultyID < 1) {
+  if (!Number.isSafeInteger(requesterAdminID) || requesterAdminID < 1) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid requester faculty ID',
+      statusMessage: 'Invalid requester admin ID',
     })
   }
 
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const db = await openFacultyDatabase()
+  const db = await openAdminDatabase()
 
   const query = (sql, params = []) =>
     new Promise((resolve, reject) => {
@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
   try {
     await run('BEGIN TRANSACTION')
 
-    await assertCanManageInternship(db, internshipId, requesterFacultyID)
+    await assertCanManageInternship(db, internshipId, requesterAdminID)
 
     // Get the actual columns in the Internship table
     const columns = await query('PRAGMA table_info(Internship)')
@@ -89,8 +89,8 @@ export default defineEventHandler(async (event) => {
     // Ignore joined fields, tagIDs, and the primary key
     const fields = Object.keys(body).filter(key =>
       key !== 'InternshipID' &&
-      key !== 'FacultyID' &&
-      key !== 'requesterFacultyID' &&
+      key !== 'AdminID' &&
+      key !== 'requesterAdminID' &&
       key !== 'tagIDs' &&
       allowedColumns.has(key)
     )

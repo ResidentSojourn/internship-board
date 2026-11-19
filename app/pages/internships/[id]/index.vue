@@ -1,7 +1,5 @@
 <script setup lang="ts">
-	import { useInternshipPage } from '~/composables/id';
-	
-	const { data, pending, error } = useInternshipPage()
+	const { data, pending, error, canEdit } = useInternshipPage()
 </script>
 
 <template>
@@ -12,9 +10,8 @@
 				{{ error.statusCode === 404 ? 'Internship not found.' : 'Could not load this internship. Please try again later.' }}
 			</p>
 			<article
-				v-else-if="data"
-				class="bg-[var(--secondary-background)] rounded-lg ring-2 ring-[var(--secondary-border)] p-4"
-			>
+					v-else-if="data"
+					class="bg-[var(--secondary-background)] rounded-lg ring-2 ring-[var(--secondary-border)] p-4">
 				<h1 class="text-xl font-bold text-[color:var(--primary-text)]">
 					{{ data.internship.Title }}
 				</h1>
@@ -41,9 +38,9 @@
 						<dt class="inline font-bold">Employer contact: </dt>
 						<dd class="inline">{{ data.internship.EmployerContact }}</dd>
 					</div>
-					<div v-if="data.internship.FacultyEmail">
-						<dt class="inline font-bold">Faculty contact: </dt>
-						<dd class="inline">{{ data.internship.FacultyEmail }}</dd>
+					<div v-if="data.internship.AdminEmail">
+						<dt class="inline font-bold">Admin contact: </dt>
+						<dd class="inline">{{ data.internship.AdminEmail }}</dd>
 					</div>
 					<div v-if="isHttpLink(data.internship.Link)">
 						<dt class="inline font-bold">More information: </dt>
@@ -59,6 +56,31 @@
 						</dd>
 					</div>
 				</dl>
+
+				<div class="flex justify-center mt-6 gap-5">
+                    <button
+						v-if="canEdit"
+                        class="button px-4 py-2 bg-[color:var(--new)] hover:[color:var(--light-new)]"
+                        @click="navigateTo('/internships/' + data.internship.InternshipID + '/edit')"
+                    >
+                        Edit Internship
+                    </button>
+                    
+                    <button
+                        class="button px-4 py-2 bg-[color:var(--back)] hover:[color:var(--light-back)]"
+                        @click="$router.back();"
+                    >
+                        Back
+                    </button>
+
+                    <button
+                        v-if="canEdit"
+                        class="button px-4 py-2 bg-[color:var(--warning)] hover:[color:var(--light-warning)]"
+                        @click="confirmDelete(data.internship.InternshipID);"
+                    >
+                        Delete Internship
+                    </button>
+                </div>
 			</article>
 		</div>
 

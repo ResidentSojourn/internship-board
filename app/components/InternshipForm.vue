@@ -75,13 +75,12 @@ const emit = defineEmits<{
 
                 <div class="flex justify-center mt-6 gap-5">
                     <button
-                        v-if="showDelete"
-                        class="button px-4 py-2 bg-[color:var(--warning)] hover:[color:var(--light-warning)]"
-                        @click="emit('delete')"
+                        class="button px-4 py-2 bg-[color:var(--new)] hover:[color:var(--light-new)]"
+                        @click="emit('save')"
                     >
-                        Delete Internship
+                        {{ submitLabel ?? 'Save Changes' }}
                     </button>
-
+                    
                     <button
                         class="button px-4 py-2 bg-[color:var(--back)] hover:[color:var(--light-back)]"
                         @click="emit('cancel')"
@@ -90,10 +89,11 @@ const emit = defineEmits<{
                     </button>
 
                     <button
-                        class="button px-4 py-2 bg-[color:var(--deep-background)] hover:[color:var(--light-background)]"
-                        @click="emit('save')"
+                        v-if="showDelete"
+                        class="button px-4 py-2 bg-[color:var(--warning)] hover:[color:var(--light-warning)]"
+                        @click="emit('delete')"
                     >
-                        {{ submitLabel ?? 'Save Changes' }}
+                        Delete Internship
                     </button>
                 </div>
             </article>
@@ -109,7 +109,7 @@ const emit = defineEmits<{
 
             <ul v-if="tagCategories.length" class="mt-2 space-y-4">
                 <li v-for="category in tagCategories" :key="category.id">
-                    <details>
+                    <details open>
                         <summary class="cursor-pointer font-bold">
                             {{ category.name }}
                         </summary>

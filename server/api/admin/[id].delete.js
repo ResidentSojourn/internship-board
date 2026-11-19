@@ -1,28 +1,28 @@
-import { openFacultyDatabase } from '../../utils/facultyDatabase.js'
+import { openFacultyDatabase as openAdminDatabase } from '../../utils/facultyDatabase.js'
 
 export default defineEventHandler(async (event) => {
   const rawId = getRouterParam(event, 'id')
   const body = await readBody(event)
 
   if (!rawId || !/^\d+$/.test(rawId)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid faculty ID' })
+    throw createError({ statusCode: 400, statusMessage: 'Invalid admin ID' })
   }
 
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid request body' })
   }
 
-  const facultyId = Number(rawId)
-  const requesterFacultyID = Number(body.requesterFacultyID)
+  const adminID = Number(rawId)
+  const requesterAdminID = Number(body.requesterAdminID)
 
   if (
-    !Number.isSafeInteger(facultyId) || facultyId < 1 ||
-    !Number.isSafeInteger(requesterFacultyID) || requesterFacultyID < 1
+    !Number.isSafeInteger(adminID) || adminID < 1 ||
+    !Number.isSafeInteger(requesterAdminID) || requesterAdminID < 1
   ) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid faculty ID' })
+    throw createError({ statusCode: 400, statusMessage: 'Invalid admin ID' })
   }
 
-  const db = await openFacultyDatabase()
+  const db = await openAdminDatabase()
   const get = (sql, params = []) => new Promise((resolve, reject) => {
     db.get(sql, params, (queryError, row) => {
       if (queryError) reject(queryError)
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
 
     const requester = await get(
       'SELECT isAdmin FROM Faculty WHERE FacultyID = ?',
-      [requesterFacultyID]
+      [requesterAdminID]
     )
 
     if (!requester || Number(requester.isAdmin) !== 1) {
@@ -50,16 +50,16 @@ export default defineEventHandler(async (event) => {
 
     const result = await run(
       'UPDATE Faculty SET isActive = 0 WHERE FacultyID = ? AND isActive = 1',
-      [facultyId]
+      [adminID]
     )
 
     if (result.changes === 0) {
-      throw createError({ statusCode: 404, statusMessage: 'Active faculty member not found' })
+      throw createError({ statusCode: 404, statusMessage: 'Active admin not found' })
     }
 
     await run('COMMIT')
 
-    return { success: true, FacultyID: facultyId, isActive: 0 }
+    return { success: true, AdminID: adminID, isActive: 0 }
   } catch (error) {
     try {
       await run('ROLLBACK')
