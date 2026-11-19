@@ -30,7 +30,6 @@
 
 							<p class="text-[color:var(--secondary-text)]">
 								{{ internship.EmployerName }}
-								<span v-if="internship.EmployerCompany"> · {{ internship.EmployerCompany }}</span>
 							</p>
 
 							<p class="mt-2 text-[color:var(--secondary-text)]">

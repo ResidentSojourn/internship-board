@@ -2,13 +2,13 @@
 import { useCreateAdmin } from '~/composables/adminDashboard'
 
 const { data: adminData, pending: adminCheckPending, error: adminCheckError } = await useFetch<{
-    isAdmin: boolean
+    isSuperAdmin: boolean
     admins: Admin[]
 }>('/api/adminDashboardAdmins', {
     query: { adminID: getAdminID() }
 })
 
-if (adminCheckError.value || !adminData.value?.isAdmin) {
+if (adminCheckError.value || !adminData.value?.isSuperAdmin) {
     await navigateTo('/adminDashboard')
 }
 
@@ -20,7 +20,7 @@ const { form, pending, error, createAdmin } = useCreateAdmin()
         Verifying admin access...
     </p>
     <AdminForm
-        v-else-if="adminData?.isAdmin"
+        v-else-if="adminData?.isSuperAdmin"
         :form="form"
         :pending="pending"
         :error="error"

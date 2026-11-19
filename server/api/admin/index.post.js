@@ -1,4 +1,4 @@
-import { openFacultyDatabase as openAdminDatabase } from '../../utils/facultyDatabase.js'
+import { openAdminDatabase } from '../../utils/adminDatabase.js'
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default defineEventHandler(async (event) => {
@@ -46,16 +46,16 @@ export default defineEventHandler(async (event) => {
     await run('BEGIN IMMEDIATE')
 
     const requester = await get(
-      'SELECT isAdmin FROM Faculty WHERE FacultyID = ?',
+      'SELECT isSuperAdmin FROM Admin WHERE AdminID = ?',
       [requesterAdminID]
     )
 
-    if (!requester || Number(requester.isAdmin) !== 1) {
+    if (!requester || Number(requester.isSuperAdmin) !== 1) {
       throw createError({ statusCode: 403, statusMessage: 'Admin access required' })
     }
 
     const existingAdmin = await get(
-      'SELECT FacultyID FROM Faculty WHERE Email = ? COLLATE NOCASE',
+      'SELECT AdminID FROM Admin WHERE Email = ? COLLATE NOCASE',
       [email]
     )
 
@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const result = await run(
-      'INSERT INTO Faculty (Email, isAdmin, isActive) VALUES (?, ?, 1)',
+      'INSERT INTO Admin (Email, isSuperAdmin, isActive) VALUES (?, ?, 1)',
       [email, body.isSuperAdmin ? 1 : 0]
     )
 

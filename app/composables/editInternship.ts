@@ -4,7 +4,7 @@ export const useEditInternship = () => {
         data: currentAdmin,
         pending: adminPending
     } = useAdminData()
-    const isAdmin = computed(() => currentAdmin.value?.isAdmin === true)
+    const isAdmin = computed(() => currentAdmin.value?.isSuperAdmin === true)
     
     // Get internship from URL
     const route = useRoute()
@@ -79,6 +79,8 @@ export const useEditInternship = () => {
             form.value = {
                 ...internship,
                 Title: internship.Title ?? '',
+                EmployerName: internship.EmployerName ?? '',
+                EmployerContact: internship.EmployerContact ?? '',
                 Description: internship.Description ?? '',
                 ExpDate: internship.ExpDate ?? '',
                 Link: internship.Link ?? '',

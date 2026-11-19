@@ -30,17 +30,15 @@ export default defineEventHandler(async () => {
       query(`
         SELECT
           Internship.InternshipID,
-          Internship.EmployerID,
-          Internship.FacultyID AS AdminID,
+          Internship.AdminID,
           Internship.Title,
           Internship.Description,
           Internship.PostDate,
           Internship.ExpDate,
           Internship.Link,
-          Employer.Name AS EmployerName,
-          Employer.Company AS EmployerCompany
+          Internship.EmployerName,
+          Internship.EmployerContact
         FROM Internship
-        LEFT JOIN Employer ON Employer.EmployerID = Internship.EmployerID
       `),
       query(`
         SELECT Tag.TagID, Tag.TagTitle, Tag.CategoryID, TagCategory.Category

@@ -43,20 +43,17 @@ export default defineEventHandler(async (event) => {
       query(`
         SELECT
           Internship.InternshipID,
-          Internship.EmployerID,
-          Internship.FacultyID AS AdminID,
+          Internship.AdminID,
           Internship.Title,
           Internship.Description,
           Internship.PostDate,
           Internship.ExpDate,
           Internship.Link,
-          Employer.Name AS EmployerName,
-          Employer.Company AS EmployerCompany,
-          Employer.Contact AS EmployerContact,
-          Faculty.Email AS AdminEmail
+          Internship.EmployerName,
+          Internship.EmployerContact,
+          Admin.Email AS AdminEmail
         FROM Internship
-        LEFT JOIN Employer ON Employer.EmployerID = Internship.EmployerID
-        LEFT JOIN Faculty ON Faculty.FacultyID = Internship.FacultyID
+        LEFT JOIN Admin ON Admin.AdminID = Internship.AdminID
         WHERE Internship.InternshipID = ?
       `, [internshipId]),
       query(`

@@ -71,7 +71,7 @@ export default defineEventHandler(async (event) => {
 
         // Verify the admin exists
         const admin = await query(
-            'SELECT FacultyID FROM Faculty WHERE FacultyID = ?',
+            'SELECT AdminID FROM Admin WHERE AdminID = ?',
             [body.AdminID]
         )
 
@@ -102,14 +102,16 @@ export default defineEventHandler(async (event) => {
         // Insert internship
         const result = await run(
             `INSERT INTO Internship
-                (Title, Description, ExpDate, Link, FacultyID, PostDate)
-            VALUES (?, ?, ?, ?, ?, ?)`,
+                (Title, Description, ExpDate, Link, AdminID, EmployerName, EmployerContact, PostDate)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 body.Title.trim(),
                 body.Description ?? '',
                 body.ExpDate || null,
                 body.Link ?? '',
                 body.AdminID,
+                body.EmployerName?.trim() ?? '',
+                body.EmployerContact?.trim() ?? '',
                 new Date().toISOString().slice(0, 10),
             ]
         )

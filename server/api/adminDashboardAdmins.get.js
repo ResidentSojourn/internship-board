@@ -1,4 +1,4 @@
-import { openFacultyDatabase as openAdminDatabase } from '../utils/facultyDatabase.js'
+import { openAdminDatabase } from '../utils/adminDatabase.js'
 
 export default defineEventHandler(async (event) => {
   const rawAdminId = getQuery(event).adminID
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const currentAdmin = await get(
-      'SELECT isAdmin FROM Faculty WHERE FacultyID = ?',
+      'SELECT isSuperAdmin FROM Admin WHERE AdminID = ?',
       [adminID]
     )
 
@@ -45,15 +45,15 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, statusMessage: 'Admin not found' })
     }
 
-    if (Number(currentAdmin.isAdmin) !== 1) {
-      return { isAdmin: false, admins: [] }
+    if (Number(currentAdmin.isSuperAdmin) !== 1) {
+      return { isSuperAdmin: false, admins: [] }
     }
 
     const admins = await all(
-      'SELECT FacultyID AS AdminID, Email, isAdmin AS isSuperAdmin, isActive FROM Faculty WHERE isActive = 1 ORDER BY Email'
+      'SELECT AdminID, Email, isSuperAdmin, isActive FROM Admin WHERE isActive = 1 ORDER BY Email'
     )
 
-    return { isAdmin: true, admins }
+    return { isSuperAdmin: true, admins }
   } finally {
     await new Promise((resolve, reject) => {
       db.close((closeError) => {

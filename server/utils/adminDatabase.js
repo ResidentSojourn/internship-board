@@ -3,7 +3,7 @@ import sqlite3 from 'sqlite3'
 
 const databasePath = resolve(process.cwd(), 'app', 'database', 'db.sqlite')
 
-export async function openFacultyDatabase() {
+export async function openAdminDatabase() {
   const db = await new Promise((resolve, reject) => {
     const database = new sqlite3.Database(databasePath, sqlite3.OPEN_READWRITE, (openError) => {
       if (openError) {
@@ -16,7 +16,7 @@ export async function openFacultyDatabase() {
 
   try {
     const columns = await new Promise((resolve, reject) => {
-      db.all('PRAGMA table_info(Faculty)', [], (queryError, rows) => {
+      db.all('PRAGMA table_info(Admin)', [], (queryError, rows) => {
         if (queryError) {
           reject(queryError)
         } else {
@@ -28,7 +28,7 @@ export async function openFacultyDatabase() {
     if (!columns.some(column => column.name === 'isActive')) {
       await new Promise((resolve, reject) => {
         db.run(
-          'ALTER TABLE Faculty ADD COLUMN isActive INTEGER NOT NULL DEFAULT 1',
+          'ALTER TABLE Admin ADD COLUMN isActive INTEGER NOT NULL DEFAULT 1',
           (migrationError) => {
             if (migrationError) {
               reject(migrationError)
@@ -49,11 +49,11 @@ export async function openFacultyDatabase() {
   }
 }
 
-export async function assertCanManageInternship(db, internshipId, requesterFacultyID) {
+export async function assertCanManageInternship(db, internshipId, requesterAdminID) {
   const requester = await new Promise((resolve, reject) => {
     db.get(
-      'SELECT isAdmin FROM Faculty WHERE FacultyID = ?',
-      [requesterFacultyID],
+      'SELECT isSuperAdmin FROM Admin WHERE AdminID = ?',
+      [requesterAdminID],
       (queryError, row) => {
         if (queryError) reject(queryError)
         else resolve(row)
@@ -67,7 +67,7 @@ export async function assertCanManageInternship(db, internshipId, requesterFacul
 
   const internship = await new Promise((resolve, reject) => {
     db.get(
-      'SELECT FacultyID FROM Internship WHERE InternshipID = ?',
+      'SELECT AdminID FROM Internship WHERE InternshipID = ?',
       [internshipId],
       (queryError, row) => {
         if (queryError) reject(queryError)
@@ -80,7 +80,7 @@ export async function assertCanManageInternship(db, internshipId, requesterFacul
     throw createError({ statusCode: 404, statusMessage: 'Internship not found' })
   }
 
-  if (Number(requester.isAdmin) !== 1 && Number(internship.FacultyID) !== requesterFacultyID) {
+  if (Number(requester.isSuperAdmin) !== 1 && Number(internship.AdminID) !== requesterAdminID) {
     throw createError({ statusCode: 403, statusMessage: 'Cannot manage this internship' })
   }
 

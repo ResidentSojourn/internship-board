@@ -55,20 +55,30 @@ const emit = defineEmits<{
                     </label>
 
                     <label class="block mt-4">
-                        <span class="font-bold">Expiration Date</span>
-                        <UInput
-                            v-model="form.ExpDate"
-                            type="date"
-                            class="mt-1 rounded border p-2"
-                        />
-                    </label>
-
-                    <label class="block mt-4">
                         <span class="font-bold">More Information Link</span>
                         <UInput
                             v-model="form.Link"
                             type="url"
                             class="mt-1 w-full rounded border p-2"
+                        />
+                    </label>
+
+                    <label class="block mt-4">
+                        <span class="font-bold">Employer Name</span>
+                        <UInput v-model="form.EmployerName" class="mt-1 w-full rounded border p-2" />
+                    </label>
+
+                    <label class="block mt-4">
+                        <span class="font-bold">Employer Contact</span>
+                        <UInput v-model="form.EmployerContact" class="mt-1 w-full rounded border p-2" />
+                    </label>
+
+                    <label class="block mt-4">
+                        <span class="font-bold">Expiration Date</span>
+                        <UInput
+                            v-model="form.ExpDate"
+                            type="date"
+                            class="mt-1 rounded border p-2"
                         />
                     </label>
                 </div>

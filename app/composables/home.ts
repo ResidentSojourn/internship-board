@@ -62,10 +62,9 @@ export const useHomePage = () => {
 
     const filteredInternships = computed(() =>
         internships.value.filter( (internship : Internship) =>
-            // Include all matching titles, employer names, and employer companies
+            // Include matching titles and employer names
             internship.Title.toLowerCase().includes(query.value.toLowerCase()) ||
-            internship.EmployerName?.toLowerCase().includes(query.value.toLowerCase()) ||
-            internship.EmployerCompany?.toLowerCase().includes(query.value.toLowerCase())
+            internship.EmployerName?.toLowerCase().includes(query.value.toLowerCase())
         )
     )
 

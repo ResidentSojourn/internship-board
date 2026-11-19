@@ -1,5 +1,5 @@
 
-import { assertCanManageInternship, openFacultyDatabase as openAdminDatabase } from '../../utils/facultyDatabase.js'
+import { assertCanManageInternship, openAdminDatabase } from '../../utils/adminDatabase.js'
 
 export default defineEventHandler(async (event) => {
     const rawId = getRouterParam(event, 'id')

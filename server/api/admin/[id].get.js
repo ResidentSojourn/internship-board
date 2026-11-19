@@ -1,4 +1,4 @@
-import { openFacultyDatabase as openAdminDatabase } from '../../utils/facultyDatabase.js'
+import { openAdminDatabase } from '../../utils/adminDatabase.js'
 
 export default defineEventHandler(async (event) => {
   const rawId = getRouterParam(event, 'id')
@@ -28,16 +28,16 @@ export default defineEventHandler(async (event) => {
 
   try {
     const requester = await get(
-      'SELECT isAdmin FROM Faculty WHERE FacultyID = ?',
+      'SELECT isSuperAdmin FROM Admin WHERE AdminID = ?',
       [requesterAdminID]
     )
 
-    if (!requester || Number(requester.isAdmin) !== 1) {
+    if (!requester || Number(requester.isSuperAdmin) !== 1) {
       throw createError({ statusCode: 403, statusMessage: 'Admin access required' })
     }
 
     const admin = await get(
-      'SELECT FacultyID AS AdminID, Email, isAdmin AS isSuperAdmin, isActive FROM Faculty WHERE FacultyID = ? AND isActive = 1',
+      'SELECT AdminID, Email, isSuperAdmin, isActive FROM Admin WHERE AdminID = ? AND isActive = 1',
       [adminID]
     )
 

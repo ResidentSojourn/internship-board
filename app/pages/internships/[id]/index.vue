@@ -18,7 +18,6 @@
 
 				<p class="mt-1 font-semibold text-[color:var(--secondary-text)]">
 					{{ data.internship.EmployerName }}
-					<span v-if="data.internship.EmployerCompany"> · {{ data.internship.EmployerCompany }}</span>
 				</p>
 
 				<p class="mt-4 whitespace-pre-line text-[color:var(--secondary-text)]">

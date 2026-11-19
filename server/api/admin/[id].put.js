@@ -1,4 +1,4 @@
-import { openFacultyDatabase as openAdminDatabase } from '../../utils/facultyDatabase.js'
+import { openAdminDatabase } from '../../utils/adminDatabase.js'
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -45,16 +45,16 @@ export default defineEventHandler(async (event) => {
     await run('BEGIN IMMEDIATE')
 
     const requester = await get(
-      'SELECT isAdmin FROM Faculty WHERE FacultyID = ?',
+      'SELECT isSuperAdmin FROM Admin WHERE AdminID = ?',
       [requesterAdminID]
     )
 
-    if (!requester || Number(requester.isAdmin) !== 1) {
+    if (!requester || Number(requester.isSuperAdmin) !== 1) {
       throw createError({ statusCode: 403, statusMessage: 'Admin access required' })
     }
 
     const admin = await get(
-      'SELECT FacultyID FROM Faculty WHERE FacultyID = ? AND isActive = 1',
+      'SELECT AdminID FROM Admin WHERE AdminID = ? AND isActive = 1',
       [adminID]
     )
 
@@ -63,7 +63,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const duplicate = await get(
-      'SELECT FacultyID FROM Faculty WHERE Email = ? COLLATE NOCASE AND FacultyID != ?',
+      'SELECT AdminID FROM Admin WHERE Email = ? COLLATE NOCASE AND AdminID != ?',
       [email, adminID]
     )
 
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
     }
 
     await run(
-      'UPDATE Faculty SET Email = ?, isAdmin = ? WHERE FacultyID = ? AND isActive = 1',
+      'UPDATE Admin SET Email = ?, isSuperAdmin = ? WHERE AdminID = ? AND isActive = 1',
       [email, body.isSuperAdmin ? 1 : 0, adminID]
     )
     await run('COMMIT')

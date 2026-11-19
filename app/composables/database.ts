@@ -2,7 +2,6 @@
 
 export type Internship = {
     InternshipID: number
-    EmployerID: number
     AdminID: number
     Title: string
     Description: string | null
@@ -10,7 +9,6 @@ export type Internship = {
     ExpDate: string | null
     Link: string | null
     EmployerName: string | null
-    EmployerCompany: string | null
 	EmployerContact: string | null
 	AdminEmail: string | null
 }
@@ -29,12 +27,14 @@ export function useInternship(id : number) {
 
 export type InternshipForm = Omit<
     Internship,
-    'Title' | 'Description' | 'ExpDate' | 'Link'
+    'Title' | 'Description' | 'ExpDate' | 'Link' | 'EmployerName' | 'EmployerContact'
 > & {
     Title: string
     Description: string
     ExpDate: string
     Link: string
+    EmployerName: string
+    EmployerContact: string
 }
 
 export function createInternship(form: InternshipForm, selectedTagIDs: number[]) {
@@ -140,7 +140,7 @@ export function deleteAdmin(adminId: number) {
 }
 
 export type AdminsData = {
-    isAdmin: boolean
+    isSuperAdmin: boolean
     admins: Admin[]
 }
 
